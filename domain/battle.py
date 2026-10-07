@@ -12,12 +12,14 @@ def determine_winner(
 ) -> dict:
     first_score = calculate_battle_score(first_level, first_force)
     second_score = calculate_battle_score(second_level, second_force)
+
     if first_score > second_score:
         winner = "first"
     elif second_score > first_score:
         winner = "second"
     else:
         winner = "draw"
+
     return {
         "winner": winner,
         "first_score": first_score,

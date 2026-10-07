@@ -1,52 +1,13 @@
-import os
-from typing import Optional
+from fastapi import APIRouter, HTTPException, status
 
-import psycopg2
-from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
-from psycopg2.extensions import connection
+from database.connection import get_connection
+from domain.battle import determine_winner
+from api.schemas import BattleRequest, PokemonBase, PokemonEdit
 
-from battle import calculate_battle_score, determine_winner
-
-app = FastAPI(title="Pokédex Batalha")
-
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = int(os.getenv("DB_PORT", "5432"))
-DB_NAME = os.getenv("DB_NAME", "pokemon")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "arthur@123")
+router = APIRouter()
 
 
-def get_connection() -> connection:
-    return psycopg2.connect(
-        host=DB_HOST,
-        port=DB_PORT,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-    )
-
-
-class PokemonBase(BaseModel):
-    nome: str = Field(..., min_length=1, max_length=100)
-    tipo: str = Field(..., min_length=1, max_length=50)
-    nivel: int = Field(..., ge=0)
-    forca: int = Field(..., ge=0)
-
-
-class PokemonEdit(BaseModel):
-    nome: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    tipo: Optional[str] = Field(default=None, min_length=1, max_length=50)
-    nivel: Optional[int] = Field(default=None, ge=0)
-    forca: Optional[int] = Field(default=None, ge=0)
-
-
-class BattleRequest(BaseModel):
-    primeiro: str
-    segundo: str
-
-
-@app.get("/pokemon")
+@router.get("/pokemon")
 def list_pokemon():
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -65,7 +26,7 @@ def list_pokemon():
             ]
 
 
-@app.post("/insert", status_code=status.HTTP_201_CREATED)
+@router.post("/insert", status_code=status.HTTP_201_CREATED)
 def insert_pokemon(pokemon: PokemonBase):
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -79,7 +40,7 @@ def insert_pokemon(pokemon: PokemonBase):
     return {"message": "Pokémon inserido", "nome": name}
 
 
-@app.put("/edit/{nome}")
+@router.put("/edit/{nome}")
 def edit_pokemon(nome: str, pokemon: PokemonEdit):
     if (
         pokemon.nome is None
@@ -112,7 +73,7 @@ def edit_pokemon(nome: str, pokemon: PokemonEdit):
     return {"message": "Pokémon atualizado", "nome": updated[0]}
 
 
-@app.delete("/delete/{nome}")
+@router.delete("/delete/{nome}")
 def delete_pokemon(nome: str):
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -126,7 +87,7 @@ def delete_pokemon(nome: str):
     return {"message": "Pokémon deletado", "nome": deleted[0]}
 
 
-@app.post("/battle")
+@router.post("/battle")
 def battle(request: BattleRequest):
     with get_connection() as conn:
         with conn.cursor() as cursor:
@@ -142,9 +103,7 @@ def battle(request: BattleRequest):
 
     first_level, first_force = rows[request.primeiro]
     second_level, second_force = rows[request.segundo]
-    result = determine_winner(
-        first_level, first_force, second_level, second_force
-    )
+    result = determine_winner(first_level, first_force, second_level, second_force)
     return {
         "primeiro": request.primeiro,
         "segundo": request.segundo,

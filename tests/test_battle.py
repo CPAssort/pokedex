@@ -1,6 +1,6 @@
 import unittest
 
-from battle import calculate_battle_score, determine_winner
+from domain.battle import calculate_battle_score, determine_winner
 
 
 class BattleCalculationTest(unittest.TestCase):
