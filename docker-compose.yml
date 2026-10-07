@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    container_name: postgres
+    environment:
+      - "POSTGRES_PASSWORD=arthur@123"
+    volumes: 
+      - postgres_db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks: 
+      - arthur_lab
+    
+networks:
+  arthur_lab:
+    driver: bridge 
+
+volumes:
+  postgres_db: {}
