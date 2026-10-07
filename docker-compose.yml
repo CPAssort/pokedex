@@ -4,13 +4,15 @@ services:
     restart: always
     container_name: postgres
     environment:
-      - "POSTGRES_PASSWORD=arthur@123"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     volumes: 
       - postgres_db:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks: 
       - arthur_lab
+    env_file:
+      - .env
     
 networks:
   arthur_lab:
