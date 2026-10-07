@@ -62,12 +62,12 @@ O arquivo `.env` aceita as variáveis seguintes:
 
 ```env
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=arthur@123
+POSTGRES_PASSWORD=troque_esta_senha
 DB_HOST=postgres
 DB_PORT=5432
 DB_NAME=pokemon
 DB_USER=pokemon_app
-DB_PASSWORD=arthur_app@123
+DB_PASSWORD=troque_esta_senha
 ```
 
 - `POSTGRES_USER` e `POSTGRES_PASSWORD` configuram o usuário administrativo do PostgreSQL.
@@ -76,7 +76,7 @@ DB_PASSWORD=arthur_app@123
 - `DB_NAME` é o banco de dados.
 - `DB_USER` e `DB_PASSWORD` configuram o usuário da API.
 
-> Não substitua os valores por credenciais reais antes de utilizar o projeto em um ambiente compartilh. O arquivo `.env` deve permanecer local e não ser versionado.
+> Substitua os placeholders pelos dados próprios antes de executar a API. O arquivo `.env` deve permanecer local e não ser versionado. O código não utiliza senhas padrão.
 
 ## Executar com Docker Compose
 

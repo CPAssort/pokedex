@@ -1,0 +1,44 @@
+[1mdiff --git a/docker-compose.yml b/docker-compose.yml[m
+[1mindex 7240ed5..13a3089 100644[m
+[1m--- a/docker-compose.yml[m
+[1m+++ b/docker-compose.yml[m
+[36m@@ -12,7 +12,6 @@[m [mservices:[m
+       DB_PASSWORD: ${DB_PASSWORD}[m
+     volumes:[m
+       - postgres_db:/var/lib/postgresql/data[m
+[31m-      - ./migrations/schema/00_create_pokedex.sql:/docker-entrypoint-initdb.d/00_create_pokedex.sql:ro[m
+     ports:[m
+       - "5432:5432"[m
+     networks:[m
+[36m@@ -63,6 +62,7 @@[m [mservices:[m
+       DB_HOST: postgres[m
+     volumes:[m
+       - ./migrations/scripts/create_user.sh:/migrations/create_user.sh:ro[m
+[32m+[m[32m      - ./migrations/schema/00_create_pokedex.sql:/migrations/00_create_pokedex.sql:ro[m[41m[m
+     command: ["/bin/sh", "/migrations/create_user.sh"][m
+     networks:[m
+       - arthur_lab[m
+[1mdiff --git a/migrations/scripts/create_user.sh b/migrations/scripts/create_user.sh[m
+[1mindex 48b9902..69dfafe 100644[m
+[1m--- a/migrations/scripts/create_user.sh[m
+[1m+++ b/migrations/scripts/create_user.sh[m
+[36m@@ -24,7 +24,19 @@[m [mSELECT format([m
+ )[m
+ WHERE NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = :'db_user') \[m
+ \gexec[m
+[32m+[m[32mEOSQL[m
+[32m+[m
+[32m+[m[32mpsql -v ON_ERROR_STOP=1 \[m
+[32m+[m[32m    --host "$DB_HOST" \[m
+[32m+[m[32m    --username "$POSTGRES_USER" \[m
+[32m+[m[32m    --dbname "$DB_NAME" \[m
+[32m+[m[32m    --file /migrations/00_create_pokedex.sql[m
+ [m
+[32m+[m[32mpsql -v ON_ERROR_STOP=1 \[m
+[32m+[m[32m    --host "$DB_HOST" \[m
+[32m+[m[32m    --username "$POSTGRES_USER" \[m
+[32m+[m[32m    --dbname "$DB_NAME" \[m
+[32m+[m[32m    --set=db_user="$DB_USER" <<EOSQL[m
+ GRANT CONNECT ON DATABASE "$DB_NAME" TO :"db_user";[m
+ GRANT USAGE ON SCHEMA public TO :"db_user";[m
+ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE pokedex TO :"db_user";[m

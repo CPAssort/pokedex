@@ -12,7 +12,6 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_db:/var/lib/postgresql/data
-      - ./migrations/schema/00_create_pokedex.sql:/docker-entrypoint-initdb.d/00_create_pokedex.sql:ro
     ports:
       - "5432:5432"
     networks:
@@ -63,6 +62,7 @@ services:
       DB_HOST: postgres
     volumes:
       - ./migrations/scripts/create_user.sh:/migrations/create_user.sh:ro
+      - ./migrations/schema/00_create_pokedex.sql:/migrations/00_create_pokedex.sql:ro
     command: ["/bin/sh", "/migrations/create_user.sh"]
     networks:
       - arthur_lab
